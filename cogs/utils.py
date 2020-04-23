@@ -19,11 +19,11 @@ class Utils(commands.Cog):
         logger.info('[cogs] [utils] Utils 모듈이 준비되었습니다.')
 
     # Commands
-    @commands.command(name='핑')
+    @commands.command(name='핑', description='봇의 응답 지연 속도를 확인합니다.')
     async def ping(self, ctx: commands.Context):
         await ctx.send(f'Pong! ({round(self.client.latency * 1000)}ms)')
 
-    @commands.command(name='정보')
+    @commands.command(name='정보', description='멘션한 유저의 정보를 받아옵니다.')
     async def get_user_info(self, ctx: commands.Context, member_mention: str):
         member_id: int = int(str(member_mention).translate(str.maketrans('', '', '<@!>')))
         guild: discord.Guild = ctx.guild
@@ -42,7 +42,7 @@ class Utils(commands.Cog):
 
         await ctx.send(embed=info_embed)
 
-    @commands.command(name='서버정보')
+    @commands.command(name='서버정보', description='현재 서버의 정보를 확인합니다.')
     async def get_server_info(self, ctx: commands.Context):
         guild: discord.Guild = ctx.guild
         # Create an Embed which contains member's information

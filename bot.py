@@ -2,6 +2,7 @@
 import logging
 import sys
 import os
+import traceback
 
 import discord
 from discord.ext import commands
@@ -16,6 +17,16 @@ logger.addHandler(handler)
 
 # 봇 설정 변수들.
 token: str = ''
+
+
+class IFBot(commands.Bot):
+
+    def __init__(self, *args, **kwargs):
+        self.dev_ids: list = [280855156608860160]
+        self.do_reboot: bool = False
+        super.__init__(*args, **kwargs)
+
+
 desc = 'Team IF 서버관리 및 개발 자동화용 디스코드 봇입니다.'
 bot = commands.Bot(command_prefix='!', description=desc)  # 봇 변수
 bot.do_reboot = False  # 봇 재시작 명령어 체크용 flag
@@ -31,7 +42,7 @@ Using discord.ext.commands.Cog, this bot manages several function per extension.
 async def manage_module(ctx: commands.Context):
     msg = '>>> **현재 불러와진 모듈**'
     for module in bot.extensions:
-        msg += f'\n  {module}'
+        msg += f'\n \* {str(module).replace("cogs.", "")}'
 
     msg += '\n\n사용법: `모듈 (로드/언로드/리로드) [모듈이름]`'
     await ctx.send(msg)
@@ -153,11 +164,6 @@ def save_datas():
         return result, error
 
 
-
-
-
-
-
 """
 [ Discord.py Events ]
 on_ready(): 
@@ -172,14 +178,20 @@ async def on_ready():
 
 
 @bot.event
-async def on_command_error(ctx, e):
-    await ctx.send(e)
+async def on_command_error(ctx: commands.Context, e: Exception):
+    await ctx.send(f'> **{ctx.command}** 명령어에서 오류가 발생했습니다!\n {e.with_traceback(e.__traceback__)}')
 
 
 init()
 bot.run(token)
+result, error = save_datas()
+print(f'save_datas() result = {result}')
+if error is not None:
+    print(f'save_datas() error type = {type(result)}')
+    print(f'save_datas() error content = {str(result)}')
 
 # if reboot mode on, run reboot code
+print(f' Is bot need to be rebooted? : {bot.is_closed() and bot.do_reboot}')
 if bot.is_closed() and bot.do_reboot:
     print('[bot.py] > 봇 재시작 명령이 들어와 봇을 재시작합니다 :')
     excutable = sys.executable
